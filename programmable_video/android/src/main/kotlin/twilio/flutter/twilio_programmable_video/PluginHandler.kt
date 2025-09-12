@@ -19,7 +19,6 @@ import com.twilio.video.ConnectOptions
 import com.twilio.video.DataTrackOptions
 import com.twilio.video.G722Codec
 import com.twilio.video.H264Codec
-import com.twilio.video.IsacCodec
 import com.twilio.video.LocalAudioTrack
 import com.twilio.video.LocalDataTrack
 import com.twilio.video.LocalParticipant
@@ -39,9 +38,11 @@ import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
+import tvi.webrtc.audio.WebRtcAudioUtils
+
 import java.nio.ByteBuffer
 import java.util.ArrayList
-import tvi.webrtc.voiceengine.WebRtcAudioUtils
+
 
 class PluginHandler : MethodCallHandler, ActivityAware, BaseListener {
     private val TAG = "PluginHandler"
@@ -487,10 +488,7 @@ class PluginHandler : MethodCallHandler, ActivityAware, BaseListener {
 
     private fun connect(call: MethodCall, result: MethodChannel.Result) {
         debug("connect => called, Build.MODEL: '${Build.MODEL}'")
-        if (TwilioProgrammableVideoPlugin.HARDWARE_AEC_BLACKLIST.contains(Build.MODEL) && !WebRtcAudioUtils.useWebRtcBasedAcousticEchoCanceler()) {
-            debug("connect => setWebRtcBasedAcousticEchoCanceler: true")
-            WebRtcAudioUtils.setWebRtcBasedAcousticEchoCanceler(true)
-        }
+
         val optionsObj = call.argument<Map<String, Any>>("connectOptions")
                 ?: return result.error("MISSING_PARAMS", "Missing 'connectOptions' parameter", null)
 
@@ -522,7 +520,6 @@ class PluginHandler : MethodCallHandler, ActivityAware, BaseListener {
                 val audioCodecs = ArrayList<AudioCodec>()
                 for ((audioCodec) in preferredAudioCodecs) {
                     when (audioCodec) {
-                        IsacCodec.NAME -> audioCodecs.add(IsacCodec())
                         OpusCodec.NAME -> audioCodecs.add(OpusCodec())
                         PcmaCodec.NAME -> audioCodecs.add(PcmaCodec())
                         PcmuCodec.NAME -> audioCodecs.add(PcmuCodec())
