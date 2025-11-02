@@ -28,6 +28,7 @@ apply plugin: 'kotlin-parcelize'
 
 android {
     compileSdkVersion 35
+    namespace "twilio.flutter.twilio_programmable_video"
 
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
